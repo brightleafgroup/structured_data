@@ -48,6 +48,13 @@ function structured_data_preprocess_html(&$vars) {
     $data['@type'] = $schema_type;
   }
 
+  // Add site name info.
+  $structured_data['name'] = structured_data_get_site_name();
+  // Get the alternative site name.
+  if ($alternative_site_name = variable_get('structured_data_site_name_alternative', FALSE)) {
+    $structured_data['alternateName'] = $alternative_site_name;
+  }
+
   // If metatag has set a cononical URL, add that here too.
   $head_elements = drupal_add_html_head();
   if (!empty($head_elements['metatag_canonical'])) {
@@ -58,13 +65,8 @@ function structured_data_preprocess_html(&$vars) {
     $structured_data['url'] = url('', array('absolute' => TRUE));
   }
 
-  // Add site name info.
-  $name_data = structured_data_get_site_name_info();
-  $structured_data = array_merge($structured_data, $name_data);
-
-  // Add site logo info.
-  $logo_data = structured_data_get_site_logo_info();
-  $structured_data = array_merge($structured_data, $logo_data);
+  // Add site logo.
+  $structured_data['logo'] = structured_data_get_site_logo();
 
   // Add local business info.
   $local_data = structured_data_get_local_info();
@@ -86,52 +88,50 @@ function structured_data_preprocess_html(&$vars) {
 }
 
 /**
- * Helper function: Gets the site name data.
+ * Gets only the site name.
+ *
+ * @return (string) Site name.
  */
-function structured_data_get_site_name_info() {
-  $data =  array();
-
+function structured_data_get_site_name() {
   // Get the site name.
   if ($custom_name = variable_get('structured_data_site_name_custom', FALSE)) {
-    $data['name'] = $custom_name;
+    $site_name = $custom_name;
   }
   else {
-    $data['name'] = variable_get('site_name', '');
+    $site_name = variable_get('site_name', '');
   }
 
-  // Get the alternative site name.
-  if ($alternative_site_name = variable_get('structured_data_site_name_alternative', FALSE)) {
-    $data['alternateName'] = $alternative_site_name;
-  }
-
-  return $data;
+  return $site_name;
 }
 
 /**
- * Helper function: Gets the site logo data.
+ * Gets the a URL to the site logo.
+ *
+ * @return (string) Path to a suitable logo file.
  */
-function structured_data_get_site_logo_info() {
-  $data =  array();
-
+function structured_data_get_site_logo() {
   if ($custom_logo = variable_get('structured_data_site_logo_custom', FALSE)) {
     if ($logo = file_load($custom_logo)) {
-      $data['logo'] = file_create_url($logo->uri);
+      $logo_path = file_create_url($logo->uri);
     }
   }
   else {
     $default_theme = variable_get('theme_default', 'bartik');
     $logo_path = theme_get_setting('logo', $default_theme);
-    $data['logo'] = $logo_path;
   }
 
-  return $data;
+  return $logo_path;
 }
 
 /**
- * Helper function: Gets the local business data.
+ * Gets the local business data.
+ *
+ * @return (array) Data matching schema.org definition for address.
  */
 function structured_data_get_local_info() {
-  $data = array('address' => array('@type' => 'PostalAddress'));
+  $data = array(
+    'address' => array('@type' => 'PostalAddress'),
+  );
 
   // Address parts are grouped together.
   if ($address = variable_get('structured_data_address', FALSE)) {
@@ -151,7 +151,9 @@ function structured_data_get_local_info() {
 }
 
 /**
- * Helper function: Gets the corporate contact data.
+ * Gets the corporate contact data.
+ *
+ * @return (array) Data matching schema.org definition for contactPoint.
  */
 function structured_data_get_corporate_info() {
   $data = array();
