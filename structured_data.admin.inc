@@ -28,15 +28,15 @@ function structured_data_settings_form() {
     '#default_value' => variable_get('structured_data_site_name_alternative', ''),
   );
 
-  $logo_data = structured_data_get_site_logo_info();
-  $logo_info = getimagesize($logo_data['path']);
+  $logo_path = structured_data_get_site_logo();
+  $logo_info = getimagesize($logo_path);
   $data['width'] = $logo_info[0];
   $data['height'] = $logo_info[1];
 
   if ($logo_info['width'] > 600 || $logo_info['height'] > 60) {
-    $problem_width = 'a width greater than 600px';
-    $problem_height = 'a height greater than 60px';
-    $problem_both = $problem_width . ' or ' . $problem_height;
+    $problem_width = t('a width greater than 600px');
+    $problem_height = t('a height greater than 60px');
+    $problem_both = $problem_width . ' ' . t('or') . ' ' . $problem_height;
 
     if ($logo_info['width'] > 600 && $logo_info['height'] > 60) {
       $problem = $problem_both;
@@ -54,7 +54,7 @@ function structured_data_settings_form() {
   $form['marketing']['structured_data_site_logo_current'] = array(
     '#type' =>'item',
     '#title' => t('Image that will be presented to search engines as your logo:'),
-    '#markup' => theme('image', array('path' => $logo_data['path'])),
+    '#markup' => theme('image', array('path' => $logo_path)),
   );
   $form['marketing']['structured_data_site_logo_custom'] = array(
     '#type' => 'managed_file',

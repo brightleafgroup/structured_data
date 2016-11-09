@@ -1,4 +1,4 @@
-name = Structured data markup
+name = Structured data JSON-LD
 description = Annotate your content to generate Rich Search Snippets.
 core = 7.x
 
