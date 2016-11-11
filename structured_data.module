@@ -76,6 +76,13 @@ function structured_data_preprocess_html(&$vars) {
   $corp_data = structured_data_get_corporate_info();
   $structured_data = array_merge($structured_data, $corp_data);
 
+  //Add social links.
+  $social_links = structured_data_get_social_link_info();
+  if ($social_links) {
+    $structured_data['sameAs'] = $social_links;
+  }
+
+
   // If there is any sructured data, add it to the page.
   if (!empty($structured_data)) {
     $json_ld_script = array(
@@ -175,4 +182,18 @@ function structured_data_get_corporate_info() {
   }
 
   return $data;
+}
+/**
+ * Gets the social link data.
+ *
+ * @return (array) Data matching schema.org definition for sameAs.
+ */
+function structured_data_get_social_link_info() {
+  $data = array();
+
+  if($social_links = variable_get('social_links', FALSE)) {
+    return $social_links;
+  }
+
+  return false;
 }

@@ -7,7 +7,7 @@
 /**
  * Form callback for admin settings page.
  */
-function structured_data_settings_form() {
+function structured_data_settings_form($form, &$form_state) {
   $site_name = variable_get('site_name', '');
   $form['marketing'] = array(
     '#type' => 'fieldset',
@@ -30,8 +30,8 @@ function structured_data_settings_form() {
 
   $logo_path = structured_data_get_site_logo();
   $logo_info = getimagesize($logo_path);
-  $data['width'] = $logo_info[0];
-  $data['height'] = $logo_info[1];
+  $logo_info['width'] = $logo_info[0];
+  $logo_info['height'] = $logo_info[1];
 
   if ($logo_info['width'] > 600 || $logo_info['height'] > 60) {
     $problem_width = t('a width greater than 600px');
@@ -158,8 +158,50 @@ function structured_data_settings_form() {
     '#title' => t('Zip'),
     '#default_value' => variable_get('structured_data_zip', ''),
   );
+  //Social links fields
+  $form['social_links'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Social Links'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['social_links']['structured_data_social_links_wrapper'] = array(
+    '#type' => 'container',
+    '#prefix' => '<div id="social_links_wrapper">',
+    '#suffix' => '</div>',
+  );
+  $num_of_fields = variable_get('num_of_fields');
+  $form_state['storage']['social_links']['structured_data_social_links_wrapper'] = isset($num_of_fields) ? $num_of_fields : 1;
 
+  if (isset($form_state['triggering_element']['#name']) && $form_state['triggering_element']['#name'] == 'add_social_link_button') {
+    $form_state['storage']['social_links']['structured_data_social_links_wrapper']++;
+  }
+  $social_links = array();
+  for ($i = 1; $i <= $form_state['storage']['social_links']['structured_data_social_links_wrapper']; $i++) {
+    $form['social_links']['structured_data_social_links_wrapper'][$i] = array(
+      '#type' => 'fieldset',
+      '#tree' => TRUE,
+    );
+    $form['social_links']['structured_data_social_links_wrapper'][$i]['social_link'] = array(
+      '#type' => 'textfield',
+      '#name' => 'social_link_' . $i,
+      '#title' => t('Social Link'),
+      '#default_value' => isset(variable_get('social_links')[$i - 1]) ? variable_get('social_links')[$i - 1] : $form_state['input']['social_link_' . $i],
+    );
+  }
+
+  $form['social_links']['add_social_link'] = array(
+    '#type' => 'button',
+    '#value' => t('Add social link'),
+    '#name' => 'add_social_link_button',
+    '#href' => '',
+    '#ajax' => array(
+      'callback' => 'add_social_link_form_ajax_add_product_image',
+      'wrapper' => 'social_links_wrapper',
+    ),
+  );
   $form = system_settings_form($form);
+  array_unshift($form['#submit'], 'structured_data_settings_form_submit');
 
   return $form;
 }
@@ -170,7 +212,31 @@ function structured_data_settings_form() {
 function structured_data_settings_form_submit($form, &$form_state) {
   // Create a file usage record for the logo file uploaded.
   global $user;
-  $form['structured_data_site_logo_custom']['#file']->status = FILE_STATUS_PERMANENT;
-  $file = file_save($form['structured_data_site_logo_custom']['#file']);
-  file_usage_add($file, 'structured_data', 'site_logo', $user->uid);
+  $social_links = array();
+  for($i = 1; $i > 0; $i++) {
+    if(!isset($form_state['input']['social_link_' . $i])) {
+      $count = $i -1;
+      break;
+    }
+    if($form_state['input']['social_link_' . $i] == '') {
+      continue;
+    }
+    $social_links[] = $form_state['input']['social_link_' . $i];
+  }
+  variable_set('num_of_fields', count($social_links));
+  variable_set('social_links', $social_links);
+
+  for($i = 1; $i <= $count; $i++) {
+    unset($form_state['values'][$i]);
+  }
+
+  // $form['structured_data_site_logo_custom']['#file']->status = FILE_STATUS_PERMANENT;
+  // $file = file_save($form['structured_data_site_logo_custom']['#file']);
+  // file_usage_add($file, 'structured_data', 'site_logo', $user->uid);
+
+}
+
+function add_social_link_form_ajax_add_product_image($form, &$form_state) {
+  variable_set('num_of_fields', variable_get('num_of_fields') + 1);
+  return $form['social_links']['structured_data_social_links_wrapper'];
 }
