@@ -45,7 +45,7 @@ function structured_data_preprocess_html(&$vars) {
   );
   // Override if a business type was selected.
   if ($schema_type = variable_get('structured_data_business_type', FALSE)) {
-    $data['@type'] = $schema_type;
+    $structured_data['@type'] = $schema_type;
   }
 
   // Add site name info.
