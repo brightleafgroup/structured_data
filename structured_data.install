@@ -24,6 +24,8 @@ function structured_data_uninstall() {
   variable_del('structured_data_phone');
   variable_del('structured_data_phone_type');
   variable_del('structured_data_phone_options');
+  // Social links variables.
+  variable_del('structured_data_social_links');
 }
 
 
