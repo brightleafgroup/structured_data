@@ -8,20 +8,40 @@
  * Form callback for admin settings page.
  */
 function structured_data_settings_form($form, &$form_state) {
-  $site_name = variable_get('site_name', '');
-  $form['marketing'] = array(
+
+  $form['#tree'] = TRUE;
+
+  $form['marketing'] = structured_data_marketing_form($form_state);
+  $form['corporate'] = structured_data_corporate_form($form_state);
+  $form['local'] = structured_data_local_form($form_state);
+  $form['social_links'] = structured_data_social_form($form_state);
+
+  $form = system_settings_form($form);
+  array_unshift($form['#submit'], 'structured_data_settings_form_submit');
+
+  return $form;
+}
+
+/**
+ * Fieldset builder for the Marketing details settings form.
+ */
+function structured_data_marketing_form(&$form_state) {
+  $fieldset = array(
     '#type' => 'fieldset',
     '#title' => t('Marketing details'),
     '#collapsible' => TRUE,
   );
-  $form['marketing']['structured_data_site_name_custom'] = array(
+
+  $site_name = variable_get('site_name', '');
+
+  $fieldset['structured_data_site_name_custom'] = array(
     '#type' =>'textfield',
     '#title' => t('Official site name'),
     '#description' => t('Site name or Company name, must be reasonably similar to your domain name. If left blank, %name will be used.', array('%name' => $site_name)),
     '#default_value' => variable_get('structured_data_site_name_custom', ''),
     '#attributes' => array('placeholder' => check_plain($site_name)),
   );
-  $form['marketing']['structured_data_site_name_alternative'] = array(
+  $fieldset['structured_data_site_name_alternative'] = array(
     '#type' =>'textfield',
     '#title' => t('Alternative site name (optional)'),
     '#description' => t('An alternate name you want Search Engines to consider.'),
@@ -51,12 +71,12 @@ function structured_data_settings_form($form, &$form_state) {
     }
     drupal_set_message(t('Logos with !problem will be rejected by Google.', array('!problem' => $problem)), 'warning');
   }
-  $form['marketing']['structured_data_site_logo_current'] = array(
+  $fieldset['structured_data_site_logo_current'] = array(
     '#type' =>'item',
     '#title' => t('Image that will be presented to search engines as your logo:'),
     '#markup' => theme('image', array('path' => $logo_path)),
   );
-  $form['marketing']['structured_data_site_logo_custom'] = array(
+  $fieldset['structured_data_site_logo_custom'] = array(
     '#type' => 'managed_file',
     '#title' => t('Custom site logo'),
     '#description' => t('Logos should be exactly 60px tall with width <= 600px. Allowed extensions: jpg, jpeg, png, gif.'),
@@ -69,13 +89,20 @@ function structured_data_settings_form($form, &$form_state) {
     ),
   );
 
-  $form['corporate'] = array(
+  return $fieldset;
+}
+
+/**
+ * Fieldset builder for the Corporate contacts settings form.
+ */
+function structured_data_corporate_form(&$form_state) {
+  $fieldset = array(
     '#type' => 'fieldset',
     '#title' => t('Corporate contact details'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  $form['corporate']['structured_data_phone'] = array(
+  $fieldset['structured_data_phone'] = array(
     '#type' =>'textfield',
     '#title' => t('Phone number'),
     '#default_value' => variable_get('structured_data_phone', ''),
@@ -93,14 +120,14 @@ function structured_data_settings_form($form, &$form_state) {
     'roadside assistance' => t('roadside assistance'),
     'package tracking' => t('package tracking'),
   );
-  $form['corporate']['structured_data_phone_type'] = array(
+  $fieldset['structured_data_phone_type'] = array(
     '#type' => 'select',
     '#title' => t('Contact type'),
     '#options' => $contact_types,
     '#empty_option' => t('- None - '),
     '#default_value' => variable_get('structured_data_phone_type', ''),
   );
-  $form['corporate']['structured_data_phone_options'] = array(
+  $fieldset['structured_data_phone_options'] = array(
     '#type' => 'checkboxes',
     '#title' => t('About this line'),
     '#options' => array(
@@ -111,13 +138,20 @@ function structured_data_settings_form($form, &$form_state) {
   );
   // @todo Add area served, list all/common country codes?
 
-  $form['local'] = array(
+  return $fieldset;
+}
+
+/**
+ * Fieldset builder for the Local Business settings form.
+ */
+function structured_data_local_form(&$form_state) {
+  $fieldset = array(
     '#type' => 'fieldset',
     '#title' => t('Local business details'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  $form['local']['structured_data_business_type'] = array(
+  $fieldset['structured_data_business_type'] = array(
     '#type' => 'select',
     '#title' => t('Type of business'),
     '#options' => array(
@@ -137,136 +171,137 @@ function structured_data_settings_form($form, &$form_state) {
     '#default_value' => variable_get('structured_data_business_type', ''),
   );
   // Address fields.
-  $form['local']['structured_data_address'] = array(
+  $fieldset['structured_data_address'] = array(
     '#type' =>'textfield',
     '#title' => t('Address'),
     '#size' => 120,
     '#default_value' => variable_get('structured_data_address', ''),
   );
-  $form['local']['structured_data_city'] = array(
+  $fieldset['structured_data_city'] = array(
     '#type' =>'textfield',
     '#title' => t('City'),
     '#default_value' => variable_get('structured_data_city', ''),
   );
-  $form['local']['structured_data_state'] = array(
+  $fieldset['structured_data_state'] = array(
     '#type' =>'textfield',
     '#title' => t('State'),
     '#default_value' => variable_get('structured_data_state', ''),
   );
-  $form['local']['structured_data_zip'] = array(
+  $fieldset['structured_data_zip'] = array(
     '#type' =>'textfield',
     '#title' => t('Zip'),
     '#default_value' => variable_get('structured_data_zip', ''),
   );
-  //Social links fields
-  $form['social_links'] = array(
+
+  return $fieldset;
+}
+
+/**
+ * Fieldset builder for the Social links settings form.
+ */
+function structured_data_social_form(&$form_state) {
+  $fieldset = array(
     '#type' => 'fieldset',
-    '#title' => t('Social Links'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-  $form['social_links']['structured_data_social_links_wrapper'] = array(
-    '#type' => 'container',
-    '#prefix' => '<div id="social_links_wrapper">',
+    '#title' => t('Social links'),
+    // Set up the wrapper so that AJAX will be able to replace the fieldset.
+    '#prefix' => '<div id="links-fieldset-wrapper">',
     '#suffix' => '</div>',
+    '#collapsible' => TRUE,
+//     '#collapsed' => TRUE,
   );
 
   $social_links = variable_get('structured_data_social_links', array());
-  $form_state['storage']['social_links']['structured_data_social_links_wrapper'] = count($social_links);
 
-  if (isset($form_state['triggering_element']['#name']) && $form_state['triggering_element']['#name'] == 'add_social_link_button') {
-    $form_state['storage']['social_links']['structured_data_social_links_wrapper']++;
+  // Build the fieldset with the proper number of links. We'll use
+  // $form_state['num_links'] to determine the number of textfields to build.
+  if (empty($form_state['num_links'])) {
+    if(empty($social_links)) {
+      $form_state['num_links'] = 1;
+    }
+    else {
+      $form_state['num_links'] = count($social_links) + 1;
+    }
   }
 
-  // Display the already saved Social Links.
-  for ($i = 0; $i < $form_state['storage']['social_links']['structured_data_social_links_wrapper']; $i++) {
-
-    $social_links_default_value = '';
-    if (!empty($social_links)) {
-      $social_links_default_value = isset($social_links[$i]) ? $social_links[$i] : '';
-    }
-    elseif(!empty($form_state['input']['structured_data_social_link_' . $i])) {
-      $social_links_default_value = $form_state['input']['structured_data_social_link_' . $i];
-    }
-
-    $form['social_links']['structured_data_social_links_wrapper'][$i] = array(
-      '#type' => 'fieldset',
-      '#tree' => TRUE,
-    );
-
-    $form['social_links']['structured_data_social_links_wrapper'][$i]['structured_data_social_link'] = array(
+  for ($i = 0; $i < $form_state['num_links']; $i++) {
+    $fieldset['links'][$i] = array(
       '#type' => 'textfield',
-      '#name' => 'structured_data_social_link_' . $i,
-      '#title' => t('Social Link'),
-      '#default_value' => $social_links_default_value,
+      '#title' => t('Social Network link'),
     );
+
+    if(isset($social_links[$i])) {
+      $fieldset['links'][$i]['#default_value'] = $social_links[$i];
+    }
   }
-
-  $i = $form_state['storage']['social_links']['structured_data_social_links_wrapper'];
-  // if we have nothing saved than the first index should be 0
-  // otherwise the number of the social_links saved and +1 more
-  $i = ($i > 0) ? $i+1 : 0;
-
-  // Add fieldset for an empty form element for adding NEW social links
-  $form['social_links']['structured_data_social_links_wrapper'][$i] = array(
-    '#type' => 'fieldset',
-    '#tree' => TRUE,
-  );
-
-  // Add an empty form element for adding NEW social links
-  $form['social_links']['structured_data_social_links_wrapper'][$i]['structured_data_social_link'] = array(
-    '#type' => 'textfield',
-    '#name' => 'structured_data_social_link_' . $i,
-    '#title' => t('Social Link'),
-    '#default_value' => '',
-  );
-
-  $form['social_links']['add_social_link'] = array(
-    '#type' => 'button',
-    '#value' => t('Add social link'),
-    '#name' => 'add_social_link_button',
-    '#href' => '',
+  $fieldset['add_link'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add one more'),
+    '#submit' => array('structured_data_ajax_add_more_add_one'),
+    // See the examples in ajax_example.module for more details on the
+    // properties of #ajax.
     '#ajax' => array(
-      'callback' => 'add_social_link_form_ajax_add_social_links',
-      'wrapper' => 'social_links_wrapper',
+      'callback' => 'structured_data_ajax_add_more_callback',
+      'wrapper' => 'links-fieldset-wrapper',
     ),
   );
+  if ($form_state['num_links'] > 1) {
+    $fieldset['remove_link'] = array(
+      '#type' => 'submit',
+      '#value' => t('Remove last'),
+      '#submit' => array('structured_data_ajax_add_more_remove_one'),
+      '#ajax' => array(
+        'callback' => 'structured_data_ajax_add_more_callback',
+        'wrapper' => 'links-fieldset-wrapper',
+      ),
+    );
+  }
 
-  $form = system_settings_form($form);
-  array_unshift($form['#submit'], 'structured_data_settings_form_submit');
+  return $fieldset;
+}
 
-  return $form;
+/**
+ * Callback for both ajax-enabled buttons.
+ *
+ * Selects and returns the fieldset with the links in it.
+ */
+function structured_data_ajax_add_more_callback($form, $form_state) {
+  return $form['social_links'];
+}
+
+/**
+ * Submit handler for the "add-one-more" button.
+ *
+ * Increments the max counter and causes a rebuild.
+ */
+function structured_data_ajax_add_more_add_one($form, &$form_state) {
+  $form_state['num_links']++;
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Submit handler for the "remove one" button.
+ *
+ * Decrements the max counter and causes a form rebuild.
+ */
+function structured_data_ajax_add_more_remove_one($form, &$form_state) {
+  if ($form_state['num_links'] > 1) {
+    $form_state['num_links']--;
+  }
+  $form_state['rebuild'] = TRUE;
 }
 
 /**
  * Submit handler for structured_data_settings_form().
  */
 function structured_data_settings_form_submit($form, &$form_state) {
-  $social_links = array();
-  for($i = 1; $i > 0; $i++) {
-    if(!isset($form_state['input']['social_link_' . $i])) {
-      $count = $i -1;
-      break;
-    }
-    if($form_state['input']['social_link_' . $i] == '') {
-      continue;
-    }
-    $social_links[] = $form_state['input']['social_link_' . $i];
-  }
-  variable_set('structured_data_social_links', $social_links);
-
-  for($i = 1; $i <= $count; $i++) {
-    unset($form_state['values'][$i]);
-  }
+  variable_set('structured_data_social_links', $form_state['values']['social_links']['links']);
+  unset($form_state['values']['social_links']);
 
   // Create a file usage record for the logo file uploaded.
   // global $user;
   // $form['structured_data_site_logo_custom']['#file']->status = FILE_STATUS_PERMANENT;
   // $file = file_save($form['structured_data_site_logo_custom']['#file']);
   // file_usage_add($file, 'structured_data', 'site_logo', $user->uid);
-
 }
 
-function add_social_link_form_ajax_add_social_links($form, &$form_state) {
-  return $form['social_links']['structured_data_social_links_wrapper'];
-}
+
