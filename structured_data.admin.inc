@@ -8,9 +8,6 @@
  * Form callback for admin settings page.
  */
 function structured_data_settings_form($form, &$form_state) {
-
-  $form['#tree'] = TRUE;
-
   $form['marketing'] = structured_data_marketing_form($form_state);
   $form['corporate'] = structured_data_corporate_form($form_state);
   $form['local'] = structured_data_local_form($form_state);
@@ -168,7 +165,7 @@ function structured_data_local_form(&$form_state) {
       'SportsOrganization' => 'Sports Organization',
     ),
     '#empty_option' => t('- None - '),
-    '#default_value' => variable_get('structured_data_business_type', ''),
+    '#default_value' => variable_get('structured_data_business_type', 'Organization'),
   );
   // Address fields.
   $fieldset['structured_data_address'] = array(
@@ -208,6 +205,7 @@ function structured_data_social_form(&$form_state) {
     '#suffix' => '</div>',
     '#collapsible' => TRUE,
 //     '#collapsed' => TRUE,
+    '#tree' => TRUE,
   );
 
   $social_links = variable_get('structured_data_social_links', array());
