@@ -27,19 +27,20 @@ function structured_data_marketing_form(&$form_state) {
     '#type' => 'fieldset',
     '#title' => t('Marketing details'),
     '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
   );
 
   $site_name = variable_get('site_name', '');
 
   $fieldset['structured_data_site_name_custom'] = array(
-    '#type' =>'textfield',
+    '#type' => 'textfield',
     '#title' => t('Official site name'),
     '#description' => t('Site name or Company name, must be reasonably similar to your domain name. If left blank, %name will be used.', array('%name' => $site_name)),
     '#default_value' => variable_get('structured_data_site_name_custom', ''),
     '#attributes' => array('placeholder' => check_plain($site_name)),
   );
   $fieldset['structured_data_site_name_alternative'] = array(
-    '#type' =>'textfield',
+    '#type' => 'textfield',
     '#title' => t('Alternative site name (optional)'),
     '#description' => t('An alternate name you want Search Engines to consider.'),
     '#default_value' => variable_get('structured_data_site_name_alternative', ''),
@@ -66,10 +67,11 @@ function structured_data_marketing_form(&$form_state) {
         $problem = $problem_height;
       }
     }
-    drupal_set_message(t('Logos with !problem will be rejected by Google.', array('!problem' => $problem)), 'warning');
+
+    drupal_set_message(t('Logos with @problem will be rejected by Google.', array('@problem' => $problem)), 'warning');
   }
   $fieldset['structured_data_site_logo_current'] = array(
-    '#type' =>'item',
+    '#type' => 'item',
     '#title' => t('Image that will be presented to search engines as your logo:'),
     '#markup' => theme('image', array('path' => $logo_path)),
   );
@@ -86,6 +88,10 @@ function structured_data_marketing_form(&$form_state) {
     ),
   );
 
+  if (variable_get('structured_data_site_name_custom', FALSE) != FALSE) {
+    $fieldset['#collapsed'] = FALSE;
+  }
+
   return $fieldset;
 }
 
@@ -100,7 +106,7 @@ function structured_data_corporate_form(&$form_state) {
     '#collapsed' => TRUE,
   );
   $fieldset['structured_data_phone'] = array(
-    '#type' =>'textfield',
+    '#type' => 'textfield',
     '#title' => t('Phone number'),
     '#default_value' => variable_get('structured_data_phone', ''),
   );
@@ -121,7 +127,7 @@ function structured_data_corporate_form(&$form_state) {
     '#type' => 'select',
     '#title' => t('Contact type'),
     '#options' => $contact_types,
-    '#empty_option' => t('- None - '),
+    '#empty_option' => t('- None -'),
     '#default_value' => variable_get('structured_data_phone_type', ''),
   );
   $fieldset['structured_data_phone_options'] = array(
@@ -133,6 +139,11 @@ function structured_data_corporate_form(&$form_state) {
     ),
     '#default_value' => variable_get('structured_data_phone_options', ''),
   );
+
+  if (variable_get('structured_data_phone', FALSE) != FALSE) {
+    $fieldset['#collapsed'] = FALSE;
+  }
+
   // @todo Add area served, list all/common country codes?
 
   return $fieldset;
@@ -164,31 +175,37 @@ function structured_data_local_form(&$form_state) {
       'PerformingGroup' => 'Performing Group',
       'SportsOrganization' => 'Sports Organization',
     ),
-    '#empty_option' => t('- None - '),
+    '#empty_option' => t('- None -'),
     '#default_value' => variable_get('structured_data_business_type', 'Organization'),
   );
   // Address fields.
   $fieldset['structured_data_address'] = array(
-    '#type' =>'textfield',
+    '#type' => 'textfield',
     '#title' => t('Address'),
     '#size' => 120,
     '#default_value' => variable_get('structured_data_address', ''),
   );
   $fieldset['structured_data_city'] = array(
-    '#type' =>'textfield',
+    '#type' => 'textfield',
     '#title' => t('City'),
     '#default_value' => variable_get('structured_data_city', ''),
   );
   $fieldset['structured_data_state'] = array(
-    '#type' =>'textfield',
+    '#type' => 'textfield',
     '#title' => t('State'),
     '#default_value' => variable_get('structured_data_state', ''),
   );
   $fieldset['structured_data_zip'] = array(
-    '#type' =>'textfield',
+    '#type' => 'textfield',
     '#title' => t('Zip'),
     '#default_value' => variable_get('structured_data_zip', ''),
   );
+
+  if ((variable_get('structured_data_business_type', '') != '') || (variable_get('structured_data_address', '') != '') || (variable_get('structured_data_city', '') != '') || (variable_get('structured_data_state', '') != '') || (variable_get('structured_data_zip', '') != '')) {
+    if (variable_get('structured_data_business_type', '') != 'Organization') {
+      $fieldset['#collapsed'] = FALSE;
+    }
+  }
 
   return $fieldset;
 }
@@ -204,16 +221,22 @@ function structured_data_social_form(&$form_state) {
     '#prefix' => '<div id="links-fieldset-wrapper">',
     '#suffix' => '</div>',
     '#collapsible' => TRUE,
-//     '#collapsed' => TRUE,
+    '#collapsed' => TRUE,
     '#tree' => TRUE,
   );
 
   $social_links = variable_get('structured_data_social_links', array());
 
+  if (isset($social_links[0])) {
+    if ($social_links[0] != '') {
+      $fieldset['#collapsed'] = FALSE;
+    }
+  }
+
   // Build the fieldset with the proper number of links. We'll use
   // $form_state['num_links'] to determine the number of textfields to build.
   if (empty($form_state['num_links'])) {
-    if(empty($social_links)) {
+    if (empty($social_links)) {
       $form_state['num_links'] = 1;
     }
     else {
@@ -227,7 +250,7 @@ function structured_data_social_form(&$form_state) {
       '#title' => t('Social Network link'),
     );
 
-    if(isset($social_links[$i])) {
+    if (isset($social_links[$i])) {
       $fieldset['links'][$i]['#default_value'] = $social_links[$i];
     }
   }

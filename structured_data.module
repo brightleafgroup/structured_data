@@ -78,6 +78,7 @@ function structured_data_preprocess_html(&$vars) {
 
   //Add social links.
   $social_links = structured_data_get_social_link_info();
+
   if ($social_links) {
     $structured_data['sameAs'] = $social_links;
   }
@@ -191,9 +192,9 @@ function structured_data_get_corporate_info() {
 function structured_data_get_social_link_info() {
   $data = array();
 
-  if($social_links = variable_get('social_links', FALSE)) {
+  if ($social_links = variable_get('structured_data_social_links', FALSE)) {
     return $social_links;
   }
 
-  return false;
+  return FALSE;
 }
