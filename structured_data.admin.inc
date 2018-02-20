@@ -319,10 +319,12 @@ function structured_data_settings_form_submit($form, &$form_state) {
   unset($form_state['values']['social_links']);
 
   // Create a file usage record for the logo file uploaded.
-  // global $user;
-  // $form['structured_data_site_logo_custom']['#file']->status = FILE_STATUS_PERMANENT;
-  // $file = file_save($form['structured_data_site_logo_custom']['#file']);
-  // file_usage_add($file, 'structured_data', 'site_logo', $user->uid);
+  if ($file = file_load($form_state['values']['structured_data_site_logo_custom'])) {
+    global $user;
+    $file->status = FILE_STATUS_PERMANENT;
+    file_save($file);
+    file_usage_add($file, 'structured_data', 'site_logo', $user->uid);
+  }
 }
 
 
