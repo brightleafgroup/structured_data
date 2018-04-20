@@ -7,16 +7,18 @@ use Drupal\Core\Url;
 class Helper
 {
 
-  public static function getCurrentPageMeta()
+  const emptyBundle = 'none';
+
+  public static function getCurrentPageMeta($fillEmptyValues = FALSE)
   {
     $route = \Drupal::routeMatch();
-    $routeName = $route->getRouteName();
+    $route_name = $route->getRouteName();
 
     $url = Url::fromRoute('<current>');
     $urlString = $url->toString();
 
     $matches = [];
-    $result = preg_match("/entity\\.([a-zA-Z0-9_]+)\\.canonical/", $routeName, $matches);
+    $result = preg_match("/entity\\.([a-zA-Z0-9_]+)\\.canonical/", $route_name, $matches);
     if ($result == 1)
     {
       $bundle = $matches[1];
@@ -24,16 +26,16 @@ class Helper
     }
     else
     {
-      $bundle = '';
-      $entity_id = '';
+      $bundle = $fillEmptyValues ? self::emptyBundle : '';
+      $entity_id = $fillEmptyValues ? '0' : '';
     }
 
-	$meta = [
-	  'routeName' => $routeName,
-	  'url' => $urlString,
-	  'bundle' => $bundle,
-	  'entity_id' => $entity_id,
-	];
+    $meta = [
+      'route_name' => $route_name,
+      'url' => $urlString,
+      'bundle' => $bundle,
+      'entity_id' => $entity_id,
+    ];
 
     return ($meta);
   }
@@ -78,18 +80,19 @@ class Helper
 
   public static function getPageJson($params)
   {
-    $obj = (empty($params['entity_id']) ? self::getPageJsonForEntity($params['route_name'], $params['url']) : self::getPageJsonForEntity($params['bundle'], $params['entity_id']));
-	return ($obj);
+    $obj = (empty($params['entity_id']) || $params['entity_id'] == '0') ? self::getPageJsonForRoute($params['route_name'], $params['url']) : self::getPageJsonForEntity($params['bundle'], $params['entity_id']);
+    return ($obj);
   }
 
   public static function updatePageJson(&$entity)
   {
     $existing_obj = self::getPageJson($entity);
-	
-	if(empty($entity['entity_id'])) {
-		unset($entity['bundle']);
-		unset($entity['entity_id']);
-	}
+
+    if (empty($entity['entity_id']))
+    {
+      unset($entity['bundle']);
+      unset($entity['entity_id']);
+    }
 
     if ($existing_obj == NULL)
     {

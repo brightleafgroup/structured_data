@@ -18,7 +18,7 @@ class PageJsonForm extends FormBase
   public function buildForm(array $form, FormStateInterface $form_state)
   {
     $entity = $this->getEntity();
-	
+
     $form['route_name'] = array(
       '#type' => 'textfield',
       '#title' => t('Route Name'),
@@ -32,19 +32,19 @@ class PageJsonForm extends FormBase
       '#required' => FALSE,
       '#default_value' => $entity->url,
     );
-	
+
     $form['bundle'] = array(
       '#type' => 'textfield',
       '#title' => 'Bundle',
       '#required' => FALSE,
-      '#default_value' => $entity->bundle,
+      '#default_value' => $entity->bundle == \Drupal\structured_data\Core\Helper::emptyBundle ? '' : $entity->bundle,
     );
-	
+
     $form['entity_id'] = array(
       '#type' => 'textfield',
       '#title' => 'Entity Id',
       '#required' => FALSE,
-      '#default_value' => $entity->entity_id,
+      '#default_value' => $entity->entity_id == '0' ? '' : $entity->entity_id,
     );
 
     $form['json'] = array(
@@ -96,20 +96,18 @@ class PageJsonForm extends FormBase
   {
     $route_name = \Drupal::routeMatch()->getParameter('sd_route_name');
     $url = \Drupal::routeMatch()->getParameter('sd_url');
-    $bundle = \Drupal::request()->query->get('sd_bundle');
-    $entity_id = \Drupal::request()->query->get('sd_entity_id');
-    
-	$url = str_replace('|', '/', $url);
+    $bundle = \Drupal::routeMatch()->getParameter('sd_bundle');
+    $entity_id = \Drupal::routeMatch()->getParameter('sd_entity_id');
+
+    $url = str_replace('|', '/', $url);
     $url = base64_decode($url);
 
-    $entity = self::getPageJson([
-		'route_name' => $route_name,
-		'url' => $url,
-		'bundle' => $bundle,
-		'entity_id' => $entity_id,
-	]);
-
-    $entity = \Drupal\structured_data\Core\Helper::getPageJsonForRoute($route_name, $url);
+    $entity = \Drupal\structured_data\Core\Helper::getPageJson([
+        'route_name' => $route_name,
+        'url' => $url,
+        'bundle' => $bundle,
+        'entity_id' => $entity_id,
+    ]);
 
     if (empty($entity))
     {

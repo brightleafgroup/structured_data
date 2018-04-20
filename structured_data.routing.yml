@@ -1,5 +1,5 @@
 structured_data.page.json:
-  path: '/structured_data/page/json/{sd_route_name}/{sd_url}'
+  path: '/structured_data/page/json/{sd_route_name}/{sd_url}/{sd_bundle}/{sd_entity_id}'
   defaults:
     _form: '\Drupal\structured_data\Form\PageJsonForm'
     _title: 'Page structured data json'
