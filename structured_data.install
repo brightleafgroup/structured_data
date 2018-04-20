@@ -18,6 +18,14 @@ function structured_data_schema() {
 				'type' => 'varchar',
 				'length' => 1000,
 			),
+			'bundle' => array(
+				'type' => 'varchar',
+				'length' => 128,
+			),
+			'entity_id' => array(
+				'type' => 'int',
+				'length' => 10,
+			),
 			'json' => array(
 				'type' => 'text',
 			),

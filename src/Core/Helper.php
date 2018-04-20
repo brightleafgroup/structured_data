@@ -2,40 +2,108 @@
 
 namespace Drupal\structured_data\Core;
 
-class Helper {
+use Drupal\Core\Url;
+
+class Helper
+{
+
+  public static function getCurrentPageMeta()
+  {
+    $route = \Drupal::routeMatch();
+    $routeName = $route->getRouteName();
+
+    $url = Url::fromRoute('<current>');
+    $urlString = $url->toString();
+
+    $matches = [];
+    $result = preg_match("/entity\\.([a-zA-Z0-9_]+)\\.canonical/", $routeName, $matches);
+    if ($result == 1)
+    {
+      $bundle = $matches[1];
+      $entity_id = $route->getRawParameter($bundle);
+    }
+    else
+    {
+      $bundle = '';
+      $entity_id = '';
+    }
+
+	$meta = [
+	  'routeName' => $routeName,
+	  'url' => $urlString,
+	  'bundle' => $bundle,
+	  'entity_id' => $entity_id,
+	];
+
+    return ($meta);
+  }
+
+  public static function getPageJsonForRoute($route_name, $url = NULL)
+  {
+    $query = db_select('structured_data_json', 'sdj')
+      ->fields('sdj')
+      ->condition('route_name', $route_name);
+
+    if (empty($url))
+    {
+      $query
+        ->addExpression("TRIM(IFNULL(url, '')) = ''");
+    }
+    else
+    {
+      $query
+        ->condition('url', $url);
+    }
+
+    $result = $query
+      ->execute()
+      ->fetchObject();
+
+    return ($result);
+  }
+
+  public static function getPageJsonForEntity($bundle, $entity_id)
+  {
+    $query = db_select('structured_data_json', 'sdj')
+      ->fields('sdj')
+      ->condition('bundle', $bundle)
+      ->condition('entity_id', $entity_id);
+
+    $result = $query
+      ->execute()
+      ->fetchObject();
+
+    return ($result);
+  }
+
+  public static function getPageJson($params)
+  {
+    $obj = (empty($params['entity_id']) ? self::getPageJsonForEntity($params['route_name'], $params['url']) : self::getPageJsonForEntity($params['bundle'], $params['entity_id']));
+	return ($obj);
+  }
+
+  public static function updatePageJson(&$entity)
+  {
+    $existing_obj = self::getPageJson($entity);
 	
-	public static function getPageJson($route_name, $url = NULL) {
-		$query = db_select('structured_data_json', 'sdj')
-					->fields('sdj')
-					->condition('route_name', $route_name);
-					
-		if(empty($url)) {
-			$query
-				->addExpression("TRIM(IFNULL(url, '')) = ''");
-		} else {
-			$query
-				->condition('url', $url);
-		}
-		
-		$result = $query
-				->execute()
-				->fetchObject();
-		
-		return ($result);
+	if(empty($entity['entity_id'])) {
+		unset($entity['bundle']);
+		unset($entity['entity_id']);
 	}
 
-	public static function updatePageJson(&$entity) {
-		$existing_obj = self::getPageJson($entity['route_name'], $entity['url']);
-		
-		if($existing_obj == NULL) {
-			$entity['id'] = db_insert('structured_data_json')
-				->fields($entity)
-				->execute();
-		} else {
-			db_update('structured_data_json')
-				->fields($entity)
-				->condition('id', $existing_obj->id)
-				->execute();
-		}
-	}
+    if ($existing_obj == NULL)
+    {
+      $entity['id'] = db_insert('structured_data_json')
+        ->fields($entity)
+        ->execute();
+    }
+    else
+    {
+      db_update('structured_data_json')
+        ->fields($entity)
+        ->condition('id', $existing_obj->id)
+        ->execute();
+    }
+  }
+
 }
