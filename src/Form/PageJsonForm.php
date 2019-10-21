@@ -94,7 +94,7 @@ class PageJsonForm extends FormBase {
 
     Helper::updatePageJson($entity);
 
-    drupal_set_message(t('Page Json updated successfully.'));
+    $this->messenger()->addMessage(t('Page Json updated successfully.'));
 
     if (!empty($entity['url'])) {
       $url = Url::fromUri('internal:' . $entity['url']);

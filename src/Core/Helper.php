@@ -62,7 +62,7 @@ class Helper {
    *   JSON for route.
    */
   public static function getPageJsonForRoute($route_name, $url = NULL) {
-    $query = db_select('structured_data_json', 'sdj')
+    $query = \Drupal::database()->select('structured_data_json', 'sdj')
       ->fields('sdj')
       ->condition('route_name', $route_name);
 
@@ -94,7 +94,7 @@ class Helper {
    *   JSON for entity..
    */
   public static function getPageJsonForEntity($bundle, $entity_id) {
-    $query = db_select('structured_data_json', 'sdj')
+    $query = \Drupal::database()->select('structured_data_json', 'sdj')
       ->fields('sdj')
       ->condition('bundle', $bundle)
       ->condition('entity_id', $entity_id);
@@ -137,12 +137,12 @@ class Helper {
     }
 
     if ($existing_obj == NULL) {
-      $entity['id'] = db_insert('structured_data_json')
+      $entity['id'] = \Drupal::database()->insert('structured_data_json')
         ->fields($entity)
         ->execute();
     }
     else {
-      db_update('structured_data_json')
+      \Drupal::database()->update('structured_data_json')
         ->fields($entity)
         ->condition('id', $existing_obj->id)
         ->execute();
