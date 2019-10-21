@@ -13,7 +13,7 @@ function structured_data_toolbar_alter(&$items)
     $querystring = \Drupal::getContainer()->get('request_stack')->getCurrentRequest()->getQueryString();
     if (!empty($querystring))
     {
-      $page_meta['url'] = $page_meta['url'] . '?' . $querystring;
+      $page_meta['url'] .= '?' . $querystring;
     }
     $page_meta['url'] = base64_encode($page_meta['url']);
     $page_meta['url'] = str_replace('/', '|', $page_meta['url']);
