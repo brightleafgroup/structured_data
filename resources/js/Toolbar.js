@@ -4,6 +4,8 @@
  */
 
 (function () {
+  'use strict';
+
   var previousState = window.history.state;
 
   setInterval(function () {

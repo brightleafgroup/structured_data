@@ -88,13 +88,13 @@ class PageJsonForm extends FormBase {
       'bundle' => $form_state->getValue('bundle'),
       'entity_id' => $form_state->getValue('entity_id'),
       'json' => $form_state->getValue('json'),
-      'updated_by' => \Drupal::currentUser()->id(),
+      'updated_by' => $this->currentUser()->id(),
       'updated_time' => time(),
     ];
 
     Helper::updatePageJson($entity);
 
-    $this->messenger()->addMessage(t('Page Json updated successfully.'));
+    $this->messenger()->addMessage($this->t('Page Json updated successfully.'));
 
     if (!empty($entity['url'])) {
       $url = Url::fromUri('internal:' . $entity['url']);
