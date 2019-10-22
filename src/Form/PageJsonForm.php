@@ -30,35 +30,35 @@ class PageJsonForm extends FormBase {
 
     $form['route_name'] = [
       '#type' => 'textfield',
-      '#title' => t('Route Name'),
+      '#title' => $this->t('Route Name'),
       '#required' => TRUE,
       '#default_value' => $entity->route_name,
     ];
 
     $form['url'] = [
       '#type' => 'textfield',
-      '#title' => t('Url'),
+      '#title' => $this->t('Url'),
       '#required' => FALSE,
       '#default_value' => $entity->url,
     ];
 
     $form['bundle'] = [
       '#type' => 'textfield',
-      '#title' => 'Bundle',
+      '#title' => $this->t('Bundle'),
       '#required' => FALSE,
       '#default_value' => $entity->bundle === Helper::EMPTY_BUNDLE ? '' : $entity->bundle,
     ];
 
     $form['entity_id'] = [
       '#type' => 'textfield',
-      '#title' => 'Entity Id',
+      '#title' => $this->t('Entity Id'),
       '#required' => FALSE,
       '#default_value' => $entity->entity_id == '0' ? '' : $entity->entity_id,
     ];
 
     $form['json'] = [
       '#type' => 'textarea',
-      '#title' => t('Json'),
+      '#title' => $this->t('Json'),
       '#required' => FALSE,
       '#default_value' => $entity->json,
     ];
@@ -66,7 +66,7 @@ class PageJsonForm extends FormBase {
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Submit'),
+      '#value' => $this->t('Submit'),
       '#button_type' => 'primary',
     ];
 
@@ -109,10 +109,10 @@ class PageJsonForm extends FormBase {
    *   Entity details.
    */
   private function getEntity() {
-    $route_name = \Drupal::routeMatch()->getParameter('sd_route_name');
-    $url = \Drupal::routeMatch()->getParameter('sd_url');
-    $bundle = \Drupal::routeMatch()->getParameter('sd_bundle');
-    $entity_id = \Drupal::routeMatch()->getParameter('sd_entity_id');
+    $route_name = $this->getRouteMatch()->getParameter('sd_route_name');
+    $url = $this->getRouteMatch()->getParameter('sd_url');
+    $bundle = $this->getRouteMatch()->getParameter('sd_bundle');
+    $entity_id = $this->getRouteMatch()->getParameter('sd_entity_id');
 
     $url = str_replace('|', '/', $url);
     $url = base64_decode($url);

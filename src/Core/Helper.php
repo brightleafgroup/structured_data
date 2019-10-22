@@ -55,7 +55,7 @@ class Helper {
    *
    * @param string $route_name
    *   Route name string.
-   * @param null $url
+   * @param string $url
    *   Optional URL.
    *
    * @return mixed

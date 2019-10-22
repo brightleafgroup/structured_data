@@ -1,54 +1,62 @@
 <?php
 
-function structured_data_schema() {
-	$schema['structured_data_json'] = [
-		'primary key' => ['id'],
-		'fields' => [
-			'id' => [
-				'type' => 'serial',
-				'unsigned' => TRUE,
-				'not null' => TRUE,
-			],
-			'route_name' => [
-				'type' => 'varchar',
-				'length' => 100,
-				'not null' => TRUE,
-			],
-			'url' => [
-				'type' => 'varchar',
-				'length' => 1000,
-			],
-			'bundle' => [
-				'type' => 'varchar',
-				'length' => 128,
-			],
-			'entity_id' => [
-				'type' => 'int',
-				'length' => 10,
-			],
-			'json' => [
-				'type' => 'text',
-			],
-			'updated_by' => [
-				'type' => 'int',
-				'not null' => TRUE,
-			],
-			'updated_time' => [
-				'type' => 'int',
-				'size' => 'big',
-				'not null' => TRUE,
-			],
-			'ignore_query_string' => [
-				'type' => 'int',
-				'not null' => TRUE,
-				'default' => 0,
-			],
-		],
-		'indexes' => [
-			'structured_data_json_route_name' => ['route_name'],
-			'structured_data_json_url' => ['url'],
-		],
-	];
+/**
+ * @file
+ * Contains install and update functions for Structured Data.
+ */
 
-	return $schema;
+/**
+ * Implements hook_schema().
+ */
+function structured_data_schema() {
+  $schema['structured_data_json'] = [
+    'primary key' => ['id'],
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'route_name' => [
+        'type' => 'varchar',
+        'length' => 100,
+        'not null' => TRUE,
+      ],
+      'url' => [
+        'type' => 'varchar',
+        'length' => 1000,
+      ],
+      'bundle' => [
+        'type' => 'varchar',
+        'length' => 128,
+      ],
+      'entity_id' => [
+        'type' => 'int',
+        'length' => 10,
+      ],
+      'json' => [
+        'type' => 'text',
+      ],
+      'updated_by' => [
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+      'updated_time' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+      ],
+      'ignore_query_string' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'indexes' => [
+      'structured_data_json_route_name' => ['route_name'],
+      'structured_data_json_url' => ['url'],
+    ],
+  ];
+
+  return $schema;
 }

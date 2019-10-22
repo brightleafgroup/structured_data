@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains module functions for Structured Data.
+ */
+
 use Drupal\Core\Url;
 use Drupal\structured_data\Core\Helper;
 
@@ -45,7 +50,7 @@ function structured_data_toolbar_alter(&$items) {
           'sd_route_name' => $page_meta['route_name'],
           'sd_url' => '--template--',
           'sd_bundle' => $page_meta['bundle'],
-          'sd_entity_id' => $page_meta['entity_id']
+          'sd_entity_id' => $page_meta['entity_id'],
         ])->toString(),
       ],
       'cache' => [
