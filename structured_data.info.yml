@@ -2,8 +2,7 @@ name: Structured Data JSON-LD
 description: Annotate your content to generate Rich Search Snippets.
 package: SEO
 type: module
-
 dependencies:
   - drupal:shortcut
-
 core: 8.x
+core_version_requirement: ^8 || ^9
