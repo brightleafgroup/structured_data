@@ -1,0 +1,11 @@
+{
+  "name": "drupal/structured_data",
+  "description": "Drupal 10 fork of https://www.drupal.org/project/structured_data",
+  "type": "drupal-module",
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev",
+  "homepage": "https://www.drupal.org/project/structured_data",
+  "require": {
+    "drupal/core": "^8 || ^9 || ^10",
+  }
+}
