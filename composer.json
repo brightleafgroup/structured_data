@@ -6,6 +6,6 @@
   "minimum-stability": "dev",
   "homepage": "https://www.drupal.org/project/structured_data",
   "require": {
-    "drupal/core": "^8 || ^9 || ^10",
+    "drupal/core": "^8 || ^9 || ^10"
   }
 }
